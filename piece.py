@@ -86,41 +86,20 @@ class King(Piece):
 
     def getAllowedMoves(self):
         moves = []
-        #Consider straight line on x
-        if self.x == 0:
-            moves.append((self.x + 1, self.y))
-        elif self.x == 7:
-            moves.append((self.x - 1, self.y))
-        else:
-            moves += [(self.x + 1, self.y), (self.x - 1, self.y)]
+        #Consider all of the possible moves
+        differences = [(1,0),
+                       (0,1),
+                       (1,1),
+                       (-1,0),
+                       (0,-1),
+                       (1,-1),
+                       (-1,1),
+                       (-1,-1)]
         
-        #Consider straight line on y
-        if self.y == 0:
-            moves.append((self.x, self.y + 1))
-        elif self.y == 7:
-            moves.append((self.x, self.y - 1))
-        else:
-            moves += [(self.x, self.y + 1), (self.x, self.y - 1)]
-
-        #Consider Diagonal
-        if self.x == 0:
-            if self.y == 0:
-                moves.append((self.x + 1, self.y + 1))
-            elif self.y == 7:
-                moves.append((self.x + 1, self.y - 1))
-            else:
-                moves += [(self.x + 1, self.y + 1), (self.x + 1, self.y - 1)]
-        elif self.y == 0:
-            if self.x == 7:
-                moves.append((self.x - 1, self.y - 1))
-            else:
-                moves += [(self.x + 1, self.y + 1), (self.x - 1, self.y + 1)]
-        else:
-            moves += [(self.x + 1, self.y + 1),
-                    (self.x + 1, self.y - 1),
-                    (self.x - 1, self.y + 1),
-                    (self.x - 1, self.y -1)]
-
+        for diff in differences:
+            new_move = (self.x + diff[0], self.y + diff[1])
+            if (new_move[0] >= 0 and new_move[1] <= 7) and (new_move[1] >= 0 and new_move[1] <= 7):
+                moves.append(new_move)
         return moves
 
 class Knight(Piece):
@@ -137,7 +116,7 @@ class Knight(Piece):
                       (-1,-2)]
         for diff in difference:
             new_move = (self.x + diff[0], self.y + diff[1])
-            if (new_move[0] >= 0 or new_move[0] <= 7) or (new_move[1] >= 0 or new_move[1] <= 7):
+            if (new_move[0] >= 0 and new_move[0] <= 7) and (new_move[1] >= 0 and new_move[1] <= 7):
                 moves.append(new_move)
         return moves
     
