@@ -1,5 +1,6 @@
 import pygame
 import time
+from piece import *
 
 pygame.init()
 
