@@ -12,13 +12,17 @@ class Piece():
             self.y = move_tuple[1]
         else:
             print("INVALID MOVE")
-
+            
     def set_taken(self):
         self.x = -1
         self.y = -1
 
     def get_position(self):
         return(self.x, self.y)
+    
+    def setPosition(self, x, y):
+        self.x = x
+        self.y = y
 
 
 class Pawn(Piece):
