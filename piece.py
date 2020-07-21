@@ -26,11 +26,14 @@ class Piece():
 
 
 class Pawn(Piece):
-
+    
     def __init__(self, x, y, side=0):
         super().__init__(x, y, side)
         self.start_x = x
         self.start_y = y
+        
+    def __str__(self):
+        return "P"
     
     def getAllowedMoves(self):
         if self.side == 0:
@@ -44,7 +47,10 @@ class Pawn(Piece):
 
 
 class Rook(Piece):
-
+    
+    def __str__(self):
+        return "R"
+    
     def getAllowedMoves(self):
         startRangeX = 0 - self.x
         endRangeX = 7 - self.x
@@ -55,6 +61,9 @@ class Rook(Piece):
         return x_moves + y_moves
 
 class Bishop(Piece):
+    
+    def __str__(self):
+        return "B"
 
     def getAllowedMoves(self):
         moves = []
@@ -65,7 +74,10 @@ class Bishop(Piece):
         return moves
 
 class Queen(Piece):
-
+    
+    def __str__(self):
+        return "Q"
+   
     def diagonal(self):
         moves = []
         for x in range(8):
@@ -87,6 +99,9 @@ class Queen(Piece):
         return self.diagonal() + self.straight()
 
 class King(Piece):
+    
+    def __str__(self):
+        return "K"
 
     def getAllowedMoves(self):
         moves = []
@@ -107,6 +122,9 @@ class King(Piece):
         return moves
 
 class Knight(Piece):
+    
+    def __str__(self):
+        return "N"
 
     def getAllowedMoves(self):
         moves = []
