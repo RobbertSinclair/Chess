@@ -26,6 +26,9 @@ class Piece():
         
     def get_icon(self):
         return self.icon
+    
+    def getSide(self):
+        return self.side
 
 class Pawn(Piece):
     
