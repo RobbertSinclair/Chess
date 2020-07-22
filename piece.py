@@ -34,9 +34,9 @@ class Pawn(Piece):
         self.start_x = x
         self.start_y = y
         if self.side == 0:
-            self.icon = "white_pawn.svg"
+            self.icon = "white_pawn.png"
         else:
-            self.icon = "black_pawn.svg"
+            self.icon = "black_pawn.png"
         
     def __str__(self):
         return "P"
@@ -57,9 +57,9 @@ class Rook(Piece):
     def __init__(self, x, y, side=0):
         super().__init__(x, y, side)
         if self.side == 0:
-            self.icon = "white_rook.svg"
+            self.icon = "white_rook.png"
         else:
-            self.icon = "black_rook.svg"
+            self.icon = "black_rook.png"
     
     def __str__(self):
         return "R"
@@ -78,9 +78,9 @@ class Bishop(Piece):
     def __init__(self, x, y, side=0):
         super().__init__(x, y, side)
         if self.side == 0:
-            self.icon = "white_bishop.svg"
+            self.icon = "white_bishop.png"
         else:
-            self.icon = "black_bishop.svg"
+            self.icon = "black_bishop.png"
     
     def __str__(self):
         return "B"
@@ -98,9 +98,9 @@ class Queen(Piece):
     def __init__(self, x, y, side=0):
         super().__init__(x, y, side)
         if self.side == 0:
-            self.icon = "white_queen.svg"
+            self.icon = "white_queen.png"
         else:
-            self.icon = "black_queen.svg"
+            self.icon = "black_queen.png"
     
     def __str__(self):
         return "Q"
@@ -130,9 +130,9 @@ class King(Piece):
     def __init__(self, x, y, side=0):
         super().__init__(x, y, side)
         if self.side == 0:
-            self.icon = "white_king.svg"
+            self.icon = "white_king.png"
         else:
-            self.icon = "black_king.svg"
+            self.icon = "black_king.png"
     
     def __str__(self):
         return "K"
@@ -160,9 +160,9 @@ class Knight(Piece):
     def __init__(self, x, y, side=0):
         super().__init__(x, y, side)
         if self.side == 0:
-            self.icon = "white_knight.svg"
+            self.icon = "white_knight.png"
         else:
-            self.icon = "black_knight.svg"
+            self.icon = "black_knight.png"
     
     def __str__(self):
         return "N"
