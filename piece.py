@@ -47,7 +47,7 @@ class Pawn(Piece):
     def __str__(self):
         return "P"
     
-    def getAllowedMoves(self):
+    def getAllowedMoves(self, input_board):
         if self.side == 0:
             mult = (-1, -2)
         else:
@@ -70,7 +70,7 @@ class Rook(Piece):
     def __str__(self):
         return "R"
     
-    def getAllowedMoves(self):
+    def getAllowedMoves(self, input_board):
         startRangeX = 0 - self.x
         endRangeX = 7 - self.x
         startRangeY = 0 - self.y
@@ -111,7 +111,7 @@ class Queen(Piece):
     def __str__(self):
         return "Q"
    
-    def diagonal(self):
+    def diagonal(self, input_board):
         moves = []
         for x in range(8):
             for y in range(8):
@@ -119,7 +119,7 @@ class Queen(Piece):
                     moves.append((x, y))
         return moves
     
-    def straight(self):
+    def straight(self, input_board):
         startRangeX = 0 - self.x
         endRangeX = 7 - self.x
         startRangeY = 0 - self.y
@@ -128,7 +128,7 @@ class Queen(Piece):
         y_moves = [(self.x, self.y + i) for i in range(startRangeY, endRangeY + 1)]
         return x_moves + y_moves
 
-    def getAllowedMoves(self):
+    def getAllowedMoves(self, input_board):
         return self.diagonal() + self.straight()
 
 class King(Piece):
@@ -143,7 +143,7 @@ class King(Piece):
     def __str__(self):
         return "K"
 
-    def getAllowedMoves(self):
+    def getAllowedMoves(self, input_board):
         moves = []
         #Consider all of the possible moves
         differences = [(1,0),
@@ -173,7 +173,7 @@ class Knight(Piece):
     def __str__(self):
         return "N"
 
-    def getAllowedMoves(self):
+    def getAllowedMoves(self, input_board):
         moves = []
         difference = [(2,1),
                       (2,-1),
