@@ -41,6 +41,14 @@ def input_board(width=800, height=800):
         the_height += 100
     return input_squares
 
+def draw_piece(the_piece, place_dictionary=input_board):
+    location = the_piece.getPosition()
+    if location == (-1, -1):
+        return (-100, -100)
+    else:
+        the_position = place_dictionary[location]["rect"]
+        return(the_position[0] + 8.5, the_position[1] + 8.5)
+
 
 #caption
 pygame.display.set_caption("Chess")
