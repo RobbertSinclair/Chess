@@ -3,7 +3,10 @@ class Piece():
     def __init__(self, x, y, side=0):
         self.x = x
         self.y = y
-        self.side = side
+        if side == 0:
+            self.side = 0
+        else:
+            self.side = 1
 
     def move(self, move_tuple):
         allowed = self.getAllowedMoves()
