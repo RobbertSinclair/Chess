@@ -64,6 +64,46 @@ class Piece():
                 moves.append(new_move)
             mult += 1
         return moves
+
+    def straight(self, input_board):
+        startRangeX = 0 - self.x
+        endRangeX = 7 - self.x
+        startRangeY = 0 - self.y
+        endRangeY = 7 - self.y
+        remove = []
+        x_moves = [(self.x + i, self.y) for i in range(startRangeX, endRangeX + 1)]
+        current = x_moves.index((self.x, self.y))
+        x_moves.pop(current)
+        y_moves = [(self.x, self.y + i) for i in range(startRangeY, endRangeY + 1)]
+        current = y_moves.index((self.x, self.y))
+        y_moves.pop(current)
+        the_moves = x_moves + y_moves
+        for coord in the_moves:
+            print("Loop")
+            if input_board[coord]["piece"] != 0:
+                remove = remove + self.removePlaces(coord)
+                print(remove)
+                if not self.checkAllyOccupied(coord, input_board):
+                    index = remove.index(coord)
+                    remove.pop(index)    
+        the_moves = self.removeElts(the_moves, remove)
+        print(f"The possible moves are {the_moves}")
+        return the_moves
+
+    def diagonal(self, input_board):
+        moves = []
+        remove = []
+        for x in range(8):
+            for y in range(8):
+                if abs(self.x - x) == abs(self.y - y) and (self.x != x and self.y != y):
+                    moves.append((x, y))
+                    if input_board[(x,y)]["piece"] != 0:
+                        remove = remove + self.removePlaces((x,y))
+                        if not self.checkAllyOccupied((x,y), input_board):
+                            index = remove.index((x,y))
+                            remove.pop(index)
+        moves = self.removeElts(moves, remove)
+        return moves
         
 class Pawn(Piece):
 
@@ -136,30 +176,7 @@ class Rook(Piece):
         return "R"
 
     def getAllowedMoves(self, input_board):
-        startRangeX = 0 - self.x
-        endRangeX = 7 - self.x
-        startRangeY = 0 - self.y
-        endRangeY = 7 - self.y
-        remove = []
-        x_moves = [(self.x + i, self.y) for i in range(startRangeX, endRangeX + 1)]
-        current = x_moves.index((self.x, self.y))
-        x_moves.pop(current)
-        y_moves = [(self.x, self.y + i) for i in range(startRangeY, endRangeY + 1)]
-        current = y_moves.index((self.x, self.y))
-        y_moves.pop(current)
-        the_moves = x_moves + y_moves
-        for coord in the_moves:
-            print("Loop")
-            if input_board[coord]["piece"] != 0:
-                remove = remove + self.removePlaces(coord)
-                print(remove)
-                if not self.checkAllyOccupied(coord, input_board):
-                    index = remove.index(coord)
-                    remove.pop(index)
-            
-        the_moves = self.removeElts(the_moves, remove)
-        print(f"The possible moves are {the_moves}")
-        return the_moves
+        return self.straight(input_board)
 
 class Bishop(Piece):
 
@@ -174,20 +191,7 @@ class Bishop(Piece):
         return "B"
 
     def getAllowedMoves(self, input_board):
-        moves = []
-        remove = []
-        for x in range(8):
-            for y in range(8):
-                if abs(self.x - x) == abs(self.y - y) and (self.x != x and self.y != y):
-                    moves.append((x, y))
-                    if input_board[(x,y)]["piece"] != 0:
-                        remove = remove + self.removePlaces((x,y))
-                        if not self.checkAllyOccupied((x,y), input_board):
-                            index = remove.index((x,y))
-                            remove.pop(index)
-        moves = self.removeElts(moves, remove)
-        return moves
-
+        return self.diagonal(input_board)
 
 class Queen(Piece):
 
@@ -200,47 +204,6 @@ class Queen(Piece):
 
     def __str__(self):
         return "Q"
-
-    def diagonal(self, input_board):
-        moves = []
-        remove = []
-        for x in range(8):
-            for y in range(8):
-                if abs(self.x - x) == abs(self.y - y) and (self.x != x and self.y != y):
-                    moves.append((x, y))
-                    if input_board[(x,y)]["piece"] != 0:
-                        remove = remove + self.removePlaces((x,y))
-                        if not self.checkAllyOccupied((x,y), input_board):
-                            index = remove.index((x,y))
-                            remove.pop(index)
-        moves = self.removeElts(moves, remove)
-        return moves
-    
-    def straight(self, input_board):
-        startRangeX = 0 - self.x
-        endRangeX = 7 - self.x
-        startRangeY = 0 - self.y
-        endRangeY = 7 - self.y
-        remove = []
-        x_moves = [(self.x + i, self.y) for i in range(startRangeX, endRangeX + 1)]
-        current = x_moves.index((self.x, self.y))
-        x_moves.pop(current)
-        y_moves = [(self.x, self.y + i) for i in range(startRangeY, endRangeY + 1)]
-        current = y_moves.index((self.x, self.y))
-        y_moves.pop(current)
-        the_moves = x_moves + y_moves
-        for coord in the_moves:
-            print("Loop")
-            if input_board[coord]["piece"] != 0:
-                remove = remove + self.removePlaces(coord)
-                print(remove)
-                if not self.checkAllyOccupied(coord, input_board):
-                    index = remove.index(coord)
-                    remove.pop(index)
-            
-        the_moves = self.removeElts(the_moves, remove)
-        print(f"The possible moves are {the_moves}")
-        return the_moves
 
     def getAllowedMoves(self, input_board):
         return self.diagonal(input_board) + self.straight(input_board)
