@@ -4,12 +4,24 @@ from piece import *
 
 pygame.init()
 
-#create the board
+#create the window
 screen = pygame.display.set_mode((800,800))
 
 #Set up colours
 WHITE = (255, 255, 255)
-BLACK = (0,0,0)
+BLACK = (40,40,40)
+GREEN = (0,128,0)
+
+board = [[0,0,0,0,0,0,0,0],
+         [0,0,0,0,0,0,0,0],
+         [0,0,0,0,0,0,0,0],
+         [0,0,0,0,0,0,0,0],
+         [0,0,0,0,0,0,0,0],
+         [0,0,0,0,0,0,0,0],
+         [0,0,0,0,0,0,0,0],
+         [0,0,0,0,0,0,0,0]]
+
+
 
 #Define the areas to fill the board
 def board_fill(width = 800, height = 800):
@@ -30,16 +42,58 @@ def board_fill(width = 800, height = 800):
         zero_start = not zero_start
     return positions
 
-def input_board(width=800, height=800):
+def input_board(pieces, width=800, height=800):
     input_squares = {}
     the_height = 0
+    piece_locations = {piece.getPosition(): piece for piece in pieces}
     for i in range(8):
         the_position = 0
         for j in range(8):
-            input_squares[(i, j)] = {"input": pygame.Rect(the_position, the_height, 100, 100), "rect": (the_position, the_height, 100, 100)}
+            if (j,i) in piece_locations.keys():
+                the_piece = piece_locations[(j,i)]
+            else:
+                the_piece = 0 
+            input_squares[(j, i)] = {"input": pygame.Rect(the_position, the_height, 100, 100), 
+                                    "rect": (the_position, the_height, 100, 100),
+                                    "piece": the_piece}
             the_position += 100
         the_height += 100
     return input_squares
+
+def set_up_board():
+    #Place Pawns
+    pieces = []
+    for i in range(8):
+        pieces.append(Pawn(i,1,side=1))
+        pieces.append(Pawn(i,6))
+    #Place Rooks
+    pieces.append(Rook(0,0,1))
+    pieces.append(Rook(7,0,1))
+    pieces.append(Rook(0,7))
+    pieces.append(Rook(7,7))
+    #Place Knights
+    pieces.append(Knight(1,0,1))
+    pieces.append(Knight(6,0,1))
+    pieces.append(Knight(1,7))
+    pieces.append(Knight(6,7))
+    #Place Bishops
+    pieces.append(Bishop(2,0,1))
+    pieces.append(Bishop(5,0,1))
+    pieces.append(Bishop(2,7))
+    pieces.append(Bishop(5,7))
+    #Place Kings
+    pieces.append(King(4,0,1))
+    pieces.append(King(4,7))
+    #Place Queen
+    pieces.append(Queen(3,0,1))
+    pieces.append(Queen(3,7))
+    return pieces
+
+pieces = set_up_board()
+input_board = input_board(pieces)
+
+print(pieces)
+
 
 def draw_piece(the_piece, place_dictionary=input_board):
     location = the_piece.getPosition()
@@ -47,16 +101,16 @@ def draw_piece(the_piece, place_dictionary=input_board):
         return (-100, -100)
     else:
         the_position = place_dictionary[location]["rect"]
-        return(the_position[0] + 8.5, the_position[1] + 8.5)
-
+        return(the_position[0] + 8, the_position[1] + 8)
 
 #caption
 pygame.display.set_caption("Chess")
-input_board = input_board()
+
 x = 0
 y = 0
-
+side_turn = 0
 gameExit = False
+selected = (-1, -1)
 
 while not gameExit:
     event = pygame.event.poll()
@@ -66,11 +120,45 @@ while not gameExit:
         if event.button == 1:
             for key in input_board:
                 if input_board[key]["input"].collidepoint(event.pos):
+                    the_piece = 0
                     print(f"{key} clicked")
-                    if selected == key:
+                    if selected == [key]:
                         selected = (-1, -1)
+                    elif key in selected:
+                        piece_location = input_board[the_position]["piece"].getPosition()
+                        #Taking manouver
+                        print("The value of the piece at {0} is {1}".format(key, input_board[key]["piece"]))
+                        if input_board[key]["piece"] != 0:
+                            print("This has run")
+                            if input_board[key]["piece"].getSide() != input_board[the_position]["piece"].getSide():
+                                taken_piece_index = pieces.index(input_board[key]["piece"])
+                                input_board[key]["piece"].setPosition(-1, -1)
+                                pieces[taken_piece_index].setPosition(-1,-1)
+                                print(f"The position of the taken piece is {pieces[taken_piece_index].getPosition()}")
+                                print(f"The result of draw_piece({pieces[taken_piece_index]}) is {draw_piece(pieces[taken_piece_index])}")
+
+                                #the_pieces.pop(taken_piece_index)
+                        #Move the piece
+                        piece_index = pieces.index(input_board[the_position]["piece"])
+                        input_board[the_position]["piece"] = 0
+                        pieces[piece_index].setPosition(key[0], key[1])
+                        input_board[key]["piece"] = pieces[piece_index]
+                        selected = (-1, -1)
+                        #Change the side turn
+                        if key != piece_location:
+                            if side_turn == 0:
+                                side_turn = 1
+                            else:
+                                side_turn = 0
                     else:
-                        selected = key
+                        the_piece = input_board[key]["piece"]
+                        selected = [key]
+                        
+                        if the_piece != 0 and the_piece.getSide() == side_turn:
+                            the_position = the_piece.getPosition()
+                            selected = selected + the_piece.getAllowedMoves(input_board)
+                            
+
             
     
     screen.fill(WHITE)
@@ -79,7 +167,14 @@ while not gameExit:
     for position in the_positions:
         screen.fill(BLACK, position)
     if selected != (-1, -1):
-        screen.fill(GREEN, input_board[selected]["rect"])
+        for select in selected:
+            screen.fill(GREEN, input_board[select]["rect"])
+
+
+    for piece in pieces:
+        the_image = pygame.image.load(piece.get_icon())
+        if draw_piece(piece) != (-100, -100):
+            screen.blit(the_image, draw_piece(piece))
 
     pygame.display.flip()
 
