@@ -91,8 +91,8 @@ def set_up_board():
 
 pieces = set_up_board()
 input_board = input_board(pieces)
-
-print(pieces)
+side_pieces = {0: [piece for piece in pieces if piece.getSide() == 0],
+               1: [piece for piece in pieces if piece.getSide() == 1]}
 
 
 def draw_piece(the_piece, place_dictionary=input_board):
@@ -156,7 +156,10 @@ while not gameExit:
                         
                         if the_piece != 0 and the_piece.getSide() == side_turn:
                             the_position = the_piece.getPosition()
-                            selected = selected + the_piece.getAllowedMoves(input_board)
+                            if str(the_piece) != "K":
+                                selected = selected + the_piece.getAllowedMoves(input_board, side_pieces)
+                            else:
+                                selected = selected + the_piece.getAllowedMoves(input_board, side_pieces, side_turn)
                             
 
             
