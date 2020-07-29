@@ -45,6 +45,7 @@ def board_fill(width = 800, height = 800):
 def input_board(pieces, width=800, height=800):
     input_squares = {}
     the_height = 0
+    input_squares["check"] = False
     piece_locations = {piece.getPosition(): piece for piece in pieces}
     for i in range(8):
         the_position = 0
@@ -91,9 +92,12 @@ def set_up_board():
 
 pieces = set_up_board()
 input_board = input_board(pieces)
+print(input_board)
 side_pieces = {0: [piece for piece in pieces if piece.getSide() == 0],
-               1: [piece for piece in pieces if piece.getSide() == 1]}
-
+               1: [piece for piece in pieces if piece.getSide() == 1],
+               "white_king": [piece for piece in pieces if str(piece) == "K" and piece.getSide() == 0][0],
+               "black_king": [piece for piece in pieces if str(piece) == "K" and piece.getSide() == 1][0]
+               }
 
 def draw_piece(the_piece, place_dictionary=input_board):
     location = the_piece.getPosition()
@@ -119,51 +123,50 @@ while not gameExit:
     if event.type == pygame.MOUSEBUTTONDOWN:
         if event.button == 1:
             for key in input_board:
-                if input_board[key]["input"].collidepoint(event.pos):
-                    the_piece = 0
-                    print(f"{key} clicked")
-                    if selected == [key]:
-                        selected = (-1, -1)
-                    elif key in selected:
-                        piece_location = input_board[the_position]["piece"].getPosition()
-                        #Taking manouver
-                        print("The value of the piece at {0} is {1}".format(key, input_board[key]["piece"]))
-                        if input_board[key]["piece"] != 0:
-                            print("This has run")
-                            if input_board[key]["piece"].getSide() != input_board[the_position]["piece"].getSide():
-                                taken_piece_index = pieces.index(input_board[key]["piece"])
-                                input_board[key]["piece"].setPosition(-1, -1)
-                                pieces[taken_piece_index].setPosition(-1,-1)
-                                print(f"The position of the taken piece is {pieces[taken_piece_index].getPosition()}")
-                                print(f"The result of draw_piece({pieces[taken_piece_index]}) is {draw_piece(pieces[taken_piece_index])}")
+                if key != "check":
+                    if input_board[key]["input"].collidepoint(event.pos):
+                        the_piece = 0
+                        print(f"{key} clicked")
+                        if selected == [key]:
+                            selected = (-1, -1)
+                        elif key in selected:
+                            piece_location = input_board[the_position]["piece"].getPosition()
+                            #Taking manouver
+                            print("The value of the piece at {0} is {1}".format(key, input_board[key]["piece"]))
+                            if input_board[key]["piece"] != 0:
+                                print("This has run")
+                                if input_board[key]["piece"].getSide() != input_board[the_position]["piece"].getSide():
+                                    taken_piece_index = pieces.index(input_board[key]["piece"])
+                                    input_board[key]["piece"].setPosition(-1, -1)
+                                    pieces[taken_piece_index].setPosition(-1,-1)
+                                    print(f"The position of the taken piece is {pieces[taken_piece_index].getPosition()}")
+                                    print(f"The result of draw_piece({pieces[taken_piece_index]}) is {draw_piece(pieces[taken_piece_index])}")
 
-                                #the_pieces.pop(taken_piece_index)
-                        #Move the piece
-                        piece_index = pieces.index(input_board[the_position]["piece"])
-                        input_board[the_position]["piece"] = 0
-                        pieces[piece_index].setPosition(key[0], key[1])
-                        input_board[key]["piece"] = pieces[piece_index]
-                        selected = (-1, -1)
-                        #Change the side turn
-                        if key != piece_location:
-                            if side_turn == 0:
-                                side_turn = 1
-                            else:
-                                side_turn = 0
-                    else:
-                        the_piece = input_board[key]["piece"]
-                        selected = [key]
-                        
-                        if the_piece != 0 and the_piece.getSide() == side_turn:
-                            the_position = the_piece.getPosition()
-                            if str(the_piece) != "K":
-                                selected = selected + the_piece.getAllowedMoves(input_board, side_pieces)
-                            else:
-                                selected = selected + the_piece.getAllowedMoves(input_board, side_pieces, side_turn)
+                                    #the_pieces.pop(taken_piece_index)
+                            #Move the piece
+                            piece_index = pieces.index(input_board[the_position]["piece"])
+                            input_board[the_position]["piece"] = 0
+                            pieces[piece_index].setPosition(key[0], key[1])
+                            input_board[key]["piece"] = pieces[piece_index]
+                            selected = (-1, -1)
+                            #Change the side turn
+                            if key != piece_location:
+                                if side_turn == 0:
+                                    side_turn = 1
+                                else:
+                                    side_turn = 0
+                        else:
+                            the_piece = input_board[key]["piece"]
+                            selected = [key]
                             
-
-            
+                            if the_piece != 0 and the_piece.getSide() == side_turn:
+                                the_position = the_piece.getPosition()
+                                if str(the_piece) != "K":
+                                    selected = selected + the_piece.getAllowedMoves(input_board, side_pieces)
+                                else:
+                                    selected = selected + the_piece.getAllowedMoves(input_board, side_pieces, side_turn)
     
+
     screen.fill(WHITE)
 
     the_positions = board_fill()
