@@ -41,6 +41,12 @@ class Piece():
         else:
             return side_pieces["black_king"]
 
+    def getEnemyKing(self, side_pieces):
+        if self.getSide() == 0:
+            return side_pieces["black_king"]
+        else:
+            return side_pieces["white_king"]
+
     def defend(self, playerMoves, attackMoves):
         defence = []
         for move in playerMoves:
@@ -48,7 +54,14 @@ class Piece():
                 defence.append(move)
         return defence
 
-    def removePlaces(self, coord):
+    def checkOccupied(self, position, input_board):
+        piece = input_board[position]["piece"]
+        if piece == 0:
+            return False
+        else:
+            return True
+
+    def getDangerMoves(self, coord):
         moves = []
         position = self.getPosition()
         move_diff = [coord[0] - position[0], coord[1] - position[1]]
@@ -79,7 +92,7 @@ class Piece():
         the_moves = x_moves + y_moves
         for coord in the_moves:
             if input_board[coord]["piece"] != 0:
-                remove = remove + self.removePlaces(coord)
+                remove = remove + self.getDangerMoves(coord)
                 if not self.checkAllyOccupied(coord, input_board):
                     index = remove.index(coord)
                     remove.pop(index)    
@@ -94,7 +107,7 @@ class Piece():
                 if abs(self.x - x) == abs(self.y - y) and (self.x != x and self.y != y):
                     moves.append((x, y))
                     if input_board[(x,y)]["piece"] != 0:
-                        remove = remove + self.removePlaces((x,y))
+                        remove = remove + self.getDangerMoves((x,y))
                         if not self.checkAllyOccupied((x,y), input_board):
                             index = remove.index((x,y))
                             remove.pop(index)
@@ -115,13 +128,6 @@ class Pawn(Piece):
     def __str__(self):
         return "P"
 
-    def checkOccupied(self, position, input_board):
-        piece = input_board[position]["piece"]
-        if piece == 0:
-            return False
-        else:
-            return True
-
     def checkTake(self, input_board):
         possible_takes = []
         if self.getSide() != 0:
@@ -137,6 +143,20 @@ class Pawn(Piece):
             if input_board[pos]["piece"] != 0 and input_board[pos]["piece"].getSide() != self.side:
                 possible_takes.append(pos)
         return possible_takes
+
+
+    def removePlaces(self, moves, input_board):
+        remove = []
+        for move in moves:
+            if move not in input_board["check_moves"]:
+                remove.append(move)
+        for rem in remove:
+            move_index = moves.index(rem)
+            moves.pop(move_index)
+        return moves
+                
+        
+
 
     def getAllowedMoves(self, input_board, side_pieces):
         moves = []
@@ -154,7 +174,11 @@ class Pawn(Piece):
         for move in pot_moves:
             if not self.checkOccupied(move, input_board):
                 moves.append(move)
-        return moves + self.checkTake(input_board)
+        moves = moves + self.checkTake(input_board)
+        if input_board["check"]:
+            moves = self.removePlaces(moves, input_board)
+        return moves
+            
         
 
 class Rook(Piece):
@@ -170,12 +194,11 @@ class Rook(Piece):
         return "R"
 
     def getAllowedMoves(self, input_board, side_pieces):
-        the_king = self.determineKing(side_pieces)
         moves = self.straight(input_board)
         if not input_board["check"]:
             return moves
         else:
-            attacker = the_king.getAttack(input_board, side_pieces)
+            attacker = input_board["check_moves"]
             defense = self.defend(moves, attacker)
             return defense
 
@@ -192,12 +215,11 @@ class Bishop(Piece):
         return "B"
 
     def getAllowedMoves(self, input_board, side_pieces):
-        the_king = self.determineKing(side_pieces)
         moves = self.diagonal(input_board)
         if not input_board["check"]:
             return moves
         else:
-            attacker = the_king.getAttack(input_board, side_pieces)
+            attacker = input_board["check_moves"]
             defense = self.defend(moves, attacker)
             return defense
         
@@ -214,12 +236,11 @@ class Queen(Piece):
         return "Q"
 
     def getAllowedMoves(self, input_board, side_pieces):
-        the_king = self.determineKing(side_pieces)
         moves = self.diagonal(input_board) + self.straight(input_board)
         if not input_board["check"]:    
             return moves
         else:
-            attacker = the_king.getAttack(input_board, side_pieces)
+            attacker = input_board["check_moves"]
             defense = self.defend(moves, attacker)
             return defense
 
@@ -251,6 +272,9 @@ class King(Piece):
                     enemyMoves = piece.getAllowedMoves(input_board, side_pieces, side_turn)
                 for move in enemyMoves:
                     if move in moves:
+                        remove.append(move)
+                for move in moves:
+                    if move in input_board["check_moves"]:
                         remove.append(move)    
         return remove
 
@@ -261,8 +285,12 @@ class King(Piece):
         else:
             enemySide = 0
         potential_attackers = side_pieces[enemySide]
+        print(f"The potential attackers are {potential_attackers}")
+        time.sleep(1)
         for piece in potential_attackers:
             if str(piece) != "K":
+                print(f"Executing the getAllowedMoves method for {piece}")
+                time.sleep(0.2)
                 enemyMoves = piece.getAllowedMoves(input_board, side_pieces)
                 if position in enemyMoves:
                     return enemyMoves + [piece.getPosition()]
@@ -304,7 +332,6 @@ class Knight(Piece):
 
     def getAllowedMoves(self, input_board, side_pieces):
         moves = []
-        the_king = self.determineKing(side_pieces)
         difference = [(2,1),
                     (2,-1),
                     (-2,1),
@@ -320,6 +347,6 @@ class Knight(Piece):
         if not input_board["check"]:    
             return moves
         else:
-            attacker = the_king.getAttack(input_board, side_pieces)
+            attacker = input_board["check_moves"]
             defense = self.defend(moves, attacker)
             return defense
