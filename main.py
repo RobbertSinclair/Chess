@@ -11,6 +11,7 @@ screen = pygame.display.set_mode((800,800))
 WHITE = (255, 255, 255)
 BLACK = (40,40,40)
 GREEN = (0,128,0)
+ORANGE = (255, 69, 0)
 
 board = [[0,0,0,0,0,0,0,0],
          [0,0,0,0,0,0,0,0],
@@ -46,6 +47,8 @@ def input_board(pieces, width=800, height=800):
     input_squares = {}
     the_height = 0
     input_squares["check"] = False
+    input_squares["check_attacker"] = 0
+    input_squares["check_moves"] = []
     piece_locations = {piece.getPosition(): piece for piece in pieces}
     for i in range(8):
         the_position = 0
@@ -92,7 +95,6 @@ def set_up_board():
 
 pieces = set_up_board()
 input_board = input_board(pieces)
-print(input_board)
 side_pieces = {0: [piece for piece in pieces if piece.getSide() == 0],
                1: [piece for piece in pieces if piece.getSide() == 1],
                "white_king": [piece for piece in pieces if str(piece) == "K" and piece.getSide() == 0][0],
@@ -123,7 +125,7 @@ while not gameExit:
     if event.type == pygame.MOUSEBUTTONDOWN:
         if event.button == 1:
             for key in input_board:
-                if key != "check":
+                if key != "check" and key != "check_moves" and key != "check_attacker":
                     if input_board[key]["input"].collidepoint(event.pos):
                         the_piece = 0
                         print(f"{key} clicked")
@@ -147,8 +149,30 @@ while not gameExit:
                             piece_index = pieces.index(input_board[the_position]["piece"])
                             input_board[the_position]["piece"] = 0
                             pieces[piece_index].setPosition(key[0], key[1])
+                            the_king = pieces[piece_index].getEnemyKing(side_pieces)
                             input_board[key]["piece"] = pieces[piece_index]
                             selected = (-1, -1)
+                            if str(input_board[key]["piece"]) == "K":
+                                the_moves = input_board[key]["piece"].getAllowedMoves(input_board, side_pieces, side_turn)
+                            else:
+                                the_moves = input_board[key]["piece"].getAllowedMoves(input_board, side_pieces)
+                            kingPos = the_king.getPosition()
+                            if kingPos in the_moves:
+                                input_board["check_attacker"] = input_board[key]["piece"]
+                                print("The attacking piece is {0}".format(input_board["check_attacker"]))
+                                if str(input_board["check_attacker"]) == "Q" or str(input_board["check_attacker"]) == "R" or input_board["check_attacker"] == "B":
+                                    input_board["check_moves"] = input_board["check_attacker"].getDangerMoves(kingPos) + [input_board["check_attacker"].getPosition()]
+                                elif str(input_board["check_attacker"]) == "N" or str(input_board["check_attacker"]) == "P":
+                                    input_board["check_moves"] = [input_board["check_attacker"].getPosition()]
+
+                                else:
+                                    input_board["check_moves"] = input_board["check_attacker"].getAllowedMoves(input_board, side_pieces)
+                                print(input_board["check_moves"])
+                                input_board["check"] = True
+                            else:
+                                input_board["check_attacker"] = 0
+                                input_board["check_moves"] = []
+                                input_board["check"] = False
                             #Change the side turn
                             if key != piece_location:
                                 if side_turn == 0:
@@ -175,6 +199,9 @@ while not gameExit:
     if selected != (-1, -1):
         for select in selected:
             screen.fill(GREEN, input_board[select]["rect"])
+
+    if input_board["check"]:
+        screen.fill(ORANGE, input_board[the_king.getPosition()]["rect"])
 
 
     for piece in pieces:
